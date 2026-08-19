@@ -1,8 +1,26 @@
-# Voice Dictation Stack (WSL2 + whisper.cpp + AutoHotkey)
+# 🎙️ Voice Dictation Stack
 
-Push-to-talk голосовая диктовка: зажал правый Alt → говоришь → отпустил → текст в активном окне Windows.
+![banner](assets/banner.svg)
 
-## Архитектура
+> Push-to-talk голосовая диктовка для Windows: зажал правый Alt → говоришь → отпустил → текст в активном окне.
+
+**Полностью локально** — без облачных API, без интернета, приватно. Русская речь, whisper.cpp (ggml-small q5_1) на WSL2.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Platform: Windows + WSL2](https://img.shields.io/badge/platform-Windows%20%2B%20WSL2-38bdf8)
+![Speech: whisper.cpp](https://img.shields.io/badge/asr-whisper.cpp-orange)
+
+## ✨ Возможности
+
+- **Push-to-talk** — зажал клавишу, говори, отпустил — текст вставлен
+- **Полностью офлайн** — распознавание локальное, ни байта в облако
+- **Русский язык** — `-l ru`, качество слово в слово на длинных диктовках (43+ сек)
+- **Автозапуск** — после перезагрузки Windows всё поднимается само
+- **Самолечение** — AHK перезапускает упавший сервер без участия пользователя
+- **Инструментирован** — все ошибки различимы (`ERR:curl/http/json/busy/gated_wav`), тайминги в лог
+- **Фильтр галлюцинаций** — сны whisper приходят в `*звёздочках*`, ловятся универсальным правилом
+
+## 🏗️ Архитектура
 
 ```
 Windows (AutoHotkey v2)
@@ -54,10 +72,18 @@ Windows (AHK): ждёт маркер (60с), вставляет текст че�
 - Жёсткий потолок: ~70-80 сек (curl -m 25)
 - Длиннее — диктуй частями, отпуская Alt
 
-## Логи
+## 📋 Логи
 
 | Лог | Путь |
 |---|---|
 | Тайминги/гейт/ошибки | `~/.local/share/dictate/dictate_timing.log` |
 | AHK | `C:\Users\<user>\dictate.log` |
 | Сервер | `journalctl -u whisper-server` |
+
+## 📜 Лицензия
+
+MIT — используй, форкай, делись. Поставь ⭐ если пригодилось!
+
+---
+
+*Собрано за один день разработки и отладки на реальной диктовке. Подробности: [DICTATION_REPORT.md](DICTATION_REPORT.md).*
