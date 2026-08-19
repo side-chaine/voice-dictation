@@ -1,0 +1,12 @@
+[Unit]
+Description=whisper dictation server
+After=network.target
+
+[Service]
+User=nikit
+ExecStart=/home/nikit/.local/bin/whisper-server.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
