@@ -10,7 +10,7 @@ LOCK=/tmp/dictate_inf.lock
 
 transcribe() {
     local code rc
-    code=$(curl -s -m 25 -o /tmp/dictate_resp.json -w '%{http_code}' \
+    code=$(curl -s -m 90 -o /tmp/dictate_resp.json -w '%{http_code}' \
         -X POST "$SERVER/inference" -F file=@"$1" -F response_format=json)
     rc=$?
     [ $rc -ne 0 ] && { echo "ERR:curl($rc)"; return; }
@@ -74,6 +74,7 @@ sys.exit(0 if r >= 60 else 1)
       TEXT="SILENCE"
     fi
     [ -z "$TEXT" ] && TEXT="SILENCE"
+    TEXT=$(printf '%s' "$TEXT" | tr '\r\n' '  ' | sed 's/  */ /g')
     printf '%s' "$TEXT" > /tmp/dictate_out.txt
     touch /tmp/dictate_out.done
     ;;
