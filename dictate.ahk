@@ -46,7 +46,7 @@ Dbg("script started")
     } catch as e {
         Dbg("stop ERROR: " e.Message)
     }
-    deadline := A_TickCount + 60000
+    deadline := A_TickCount + 120000
     while (A_TickCount < deadline) {
         if (FileExist(WSL_DONE))
             break
