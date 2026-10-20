@@ -8,6 +8,16 @@ TIMING=/home/nikit/.local/share/dictate/dictate_timing.log
 SERVER=http://127.0.0.1:8080
 LOCK=/tmp/dictate_inf.lock
 
+# Lazy-start: wake whisper-server if it's not answering (first press of RAlt takes ~2s longer)
+if ! curl -s -m 1 -o /dev/null "$SERVER/" 2>/dev/null; then
+    systemctl start whisper-server 2>/dev/null
+    nohup /home/nikit/.local/bin/whisper-server.sh >/dev/null 2>&1 &
+    for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        curl -s -m 1 -o /dev/null "$SERVER/" 2>/dev/null && break
+        sleep 0.5
+    done
+fi
+
 transcribe() {
     local code rc
     code=$(curl -s -m 90 -o /tmp/dictate_resp.json -w '%{http_code}' \
@@ -28,6 +38,14 @@ case "$ACTION" in
     setsid parecord --file-format=wav --rate=16000 --channels=1 "$REC" >/dev/null 2>&1 < /dev/null &
     echo $! > "$PIDFILE"
     sleep 1
+    ;;
+  abort)
+    if [ -f "$PIDFILE" ]; then
+      kill "$(cat "$PIDFILE")" 2>/dev/null
+      rm -f "$PIDFILE"
+    fi
+    rm -f "$REC" "$GATED" /tmp/dictate_out.txt /tmp/dictate_out.done
+    echo "$(date +%s.%N) aborted" >> "$TIMING"
     ;;
   stop)
     echo "$(date +%s.%N) stop_begin" >> "$TIMING"

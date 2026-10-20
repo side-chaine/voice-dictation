@@ -7,6 +7,7 @@ WSL_DONE := "\\wsl.localhost\Ubuntu\tmp\dictate_out.done"
 WSL := "wsl.exe -d Ubuntu -e /home/nikit/.local/bin/dictate-record.sh"
 isRecording := false
 isProcessing := false
+cancelled := false
 
 Dbg(msg) {
     FileAppend(A_Now " | " msg "`n", LOGF)
@@ -16,9 +17,10 @@ TrayTip("Диктовка", "Скрипт запущен", 1)
 Dbg("script started")
 
 *RAlt:: {
-    global isRecording, isProcessing
+    global isRecording, isProcessing, cancelled
     if (isRecording || isProcessing)
         return
+    cancelled := false
     isRecording := true
     Dbg("RAlt DOWN")
     try {
@@ -32,8 +34,28 @@ Dbg("script started")
     SetTimer(() => ToolTip(), -1500)
 }
 
+#HotIf isRecording
+*Esc:: {
+    global isRecording, isProcessing, cancelled
+    cancelled := true
+    isRecording := false
+    isProcessing := false
+    ToolTip()
+    Dbg("CANCELLED by Esc")
+    try Run(WSL " abort", , "Hide")
+    SoundBeep(400, 120)
+    Sleep(60)
+    SoundBeep(300, 120)
+    TrayTip("Отменено", "Диктовка", 1)
+}
+#HotIf
+
 *RAlt up:: {
-    global isRecording, isProcessing
+    global isRecording, isProcessing, cancelled
+    if (cancelled) {
+        cancelled := false
+        return
+    }
     if (!isRecording)
         return
     isRecording := false
