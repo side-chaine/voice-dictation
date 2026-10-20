@@ -69,6 +69,7 @@ Dbg("script started")
     }
     if (SubStr(text, 1, 4) == "ERR:") {
         if (InStr(text, "curl") || InStr(text, "http") || InStr(text, "busy")) {
+            isProcessing := false
             SoundBeep(250, 250)
             Dbg("heal: " text)
             try {
